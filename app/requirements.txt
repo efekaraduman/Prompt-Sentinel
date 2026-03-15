@@ -1,0 +1,6 @@
+fastapi==0.133.0
+uvicorn==0.41.0
+pydantic==2.12.5
+sqlmodel==0.0.24
+stripe==14.4.0
+redis==5.0.8

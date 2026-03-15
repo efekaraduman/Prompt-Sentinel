@@ -1,0 +1,52 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+app/venv/
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Database — never commit live data
+*.db
+*.sqlite
+*.sqlite3
+lock_test.db
+
+# Logs
+*.log
+*.err
+uvicorn.log
+uvicorn.err
+
+# Environment files — contain secrets
+.env
+.env.local
+.env.production
+.env.*.local
+
+# Next.js
+app/frontend/.next/
+app/frontend/node_modules/
+app/frontend/.env.local
+
+# Test/dev scripts (not needed in repo)
+*.ps1
+investigate.ps1
+check_misc.ps1
+smoke_test.ps1
+test_guard.ps1
+nul
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo

@@ -1,0 +1,29 @@
+# Python
+app/venv/
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+
+# Node / Next.js
+app/frontend/node_modules/
+app/frontend/.next/
+app/frontend/out/
+
+# Databases (mount a volume or set PROMPTSENTINEL_DB_PATH instead)
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Dev / repo noise
+.git/
+.gitignore
+.env
+.env.*
+*.log
+
+# Docs, tests, scripts — not needed at runtime
+*.md
+tests/
+scripts/
+sdk/
