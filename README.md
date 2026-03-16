@@ -300,9 +300,24 @@ See [`.env.example`](.env.example) for the full annotated list.
 
 ## Quick Demo
 
-> Full local demo in ~5 minutes. No external services required.
+> Full local demo in ~5 minutes. No external services or LLM API keys required — all detection is rule-based and runs entirely offline.
 
-### 1. Start the backend
+### 1. Set an API key (required for admin seed)
+
+```bash
+# Windows (set before starting the server)
+set PROMPTSENTINEL_API_KEY=demo-key
+set PROMPTSENTINEL_RATE_LIMIT_PER_MIN=60
+
+# Linux / macOS
+export PROMPTSENTINEL_API_KEY=demo-key
+export PROMPTSENTINEL_RATE_LIMIT_PER_MIN=60
+```
+
+> `PROMPTSENTINEL_API_KEY` protects admin endpoints. Without it the seed button returns 403.
+> Use any value for local demo. For a shared tunnel link, use a strong random key.
+
+### 2. Start the backend
 
 ```bash
 # Windows
@@ -312,30 +327,32 @@ app\venv\Scripts\uvicorn app.main:app --host 127.0.0.1 --port 8000
 ./start.sh
 ```
 
-### 2. Start the frontend
+### 3. Start the frontend
 
 ```bash
 cd app/frontend && npm run dev
 ```
 
-### 3. Seed demo data
+### 4. Sign in and seed demo data
 
-Visit `http://localhost:3000/admin` and click **⚡ Seed demo data**.
+1. Open `http://localhost:3000/login`
+2. Enter the API key you set above (`demo-key`) and click **Save & continue**
+3. Go to `http://localhost:3000/admin` and click **⚡ Seed demo data**
 
-This creates 3 sample red-team campaigns (customer-service bot, financial advisor, coding assistant) with ~20 realistic attack findings across all 5 categories — so the dashboard is non-empty on first launch.
+This creates 3 sample red-team campaigns, ~20 findings, 10 guard scan records, and 5 attack signatures — so every dashboard section is populated on first launch.
 
-### 4. Explore
+### 5. Explore
 
 | Page | URL | What to see |
 |---|---|---|
 | Dashboard | `http://localhost:3000` | Risk trend, guard stats, recent campaigns |
 | Campaign detail | Click any campaign row | Findings table, per-category breakdown, export |
 | Admin | `http://localhost:3000/admin` | User management, API key rotation, seed button |
-| Pricing | `http://localhost:3000/pricing` | Plan comparison, upgrade flow |
+| Pricing | `http://localhost:3000/pricing` | Plan comparison (billing shows "not configured" without Stripe — expected) |
 | Trust Center | `http://localhost:3000/trust` | Live service status, capability badges (no auth needed) |
-| API docs | `http://localhost:8000/docs` | Interactive Swagger UI — try any endpoint |
+| API docs | `http://localhost:8000/docs` | Interactive Swagger UI |
 
-### 5. Run a guard scan (curl)
+### 6. Run a guard scan (curl)
 
 ```bash
 curl -s -X POST http://localhost:8000/guard/scan \
@@ -345,6 +362,17 @@ curl -s -X POST http://localhost:8000/guard/scan \
 ```
 
 Expected: `"decision": "block"`, `"risk_score": 85+`
+
+### Tunnel deployment (Cloudflare or similar)
+
+To share with remote reviewers, tunnel the **frontend** port (3000). The Next.js server proxies `/api/*` to the local backend on your machine — reviewers' browsers never need to reach port 8000 directly.
+
+```bash
+# Example with cloudflared
+cloudflared tunnel --url http://localhost:3000
+```
+
+Set `PROMPTSENTINEL_API_KEY` to a strong random key (`python -c "import secrets; print(secrets.token_hex(32))"`) before starting the server.
 
 > **Screenshots / GIF** — coming soon.
 
