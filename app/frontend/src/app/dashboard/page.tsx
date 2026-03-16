@@ -1093,7 +1093,20 @@ export default function DashboardPage() {
           Recent Campaigns
         </h2>
         {recent.length === 0 ? (
-          <p className="text-sm text-neutral-500">No campaigns yet.</p>
+          <div className="rounded-xl border border-neutral-800 bg-neutral-900/40 px-6 py-8 text-center">
+            <p className="text-sm text-neutral-400">No campaigns yet.</p>
+            <p className="mt-1.5 text-xs text-neutral-600">
+              Seed sample data from the{" "}
+              <a href="/admin" className="text-blue-500 hover:text-blue-400 underline underline-offset-2">
+                Admin panel
+              </a>
+              , or run your first campaign from the{" "}
+              <a href="/" className="text-blue-500 hover:text-blue-400 underline underline-offset-2">
+                home page
+              </a>
+              .
+            </p>
+          </div>
         ) : (
           <div className="overflow-hidden rounded-xl border border-neutral-800">
             <table className="w-full text-sm">

@@ -126,7 +126,12 @@ function LoginContent() {
         <div className="p-6 bg-neutral-900 rounded-lg border border-neutral-800 space-y-4">
           <div>
             <h1 className="text-lg font-semibold text-neutral-100">Sign in with API key</h1>
-            <p className="text-xs text-neutral-500 mt-0.5">Paste your API key to authenticate.</p>
+            <p className="text-xs text-neutral-500 mt-0.5">
+              Paste your API key to authenticate.{" "}
+              <a href="/admin" className="text-neutral-400 hover:text-neutral-300 underline underline-offset-2">
+                Find or create one in Admin.
+              </a>
+            </p>
           </div>
 
           {apiKeySet && (
