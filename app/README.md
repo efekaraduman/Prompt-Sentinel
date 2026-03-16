@@ -1,27 +1,40 @@
-# PromptSentinel Backend
+# PromptSentinel — Backend
 
-PromptSentinel is a small FastAPI-based backend designed to simulate prompt-injection attacks against an LLM and produce a simple risk assessment.
+The backend is a FastAPI application with 75+ endpoints covering runtime guard, red-team campaigns, threat intelligence, analytics, billing, auth, and admin.
 
-## Features
+**Full documentation:** see the [root README](../README.md) and [PROMPTSENTINEL_MASTER_CONTEXT.md](../PROMPTSENTINEL_MASTER_CONTEXT.md).
 
-- **`POST /test-llm`**: Accepts a system prompt and model name, simulates 5 prompt-injection attempts, and returns:
-  - An overall **risk score** from 0–100
-  - A short **summary**
-  - Per-test details including detected leakage and instruction-override behavior
-
-## Running the API
-
-Install dependencies:
+## Quick start
 
 ```bash
+python -m venv venv
+
+# Windows
+venv\Scripts\pip install -r requirements.txt
+venv\Scripts\uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
+
+# Linux / macOS
 pip install -r requirements.txt
+uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
 ```
 
-Run the development server:
+API docs (Swagger UI): `http://localhost:8000/docs`
+Health check: `http://localhost:8000/health`
 
-```bash
-uvicorn app.main:app --reload
-```
+## Key modules
 
-The OpenAPI docs will be available at `http://localhost:8000/docs`.
-
+| File | Purpose |
+|---|---|
+| `main.py` | FastAPI app — all routes |
+| `guard.py` | Runtime guard pipeline (sync) |
+| `guard_pipeline.py` | Detector protocol + orchestration |
+| `risk_analyzer.py` | Risk scoring engine (0–100) |
+| `campaigns.py` | Campaign lifecycle |
+| `runner.py` | Single-attack executor |
+| `red_agent.py` | Adaptive red-team prompt generator |
+| `analytics.py` | Anomaly detection + aggregations |
+| `billing.py` | Stripe integration |
+| `auth.py` | Auth helpers, RBAC |
+| `db.py` | SQLite connection + inline migrations |
+| `schemas.py` | 80+ Pydantic models |
+| `models.py` | 20+ SQLModel DB tables |
