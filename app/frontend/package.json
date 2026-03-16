@@ -1,6 +1,8 @@
 {
-  "name": "frontend",
+  "name": "promptsentinel",
   "version": "0.1.0",
+  "description": "LLM security platform — red-team campaigns and runtime prompt-injection guard",
+  "license": "MIT",
   "private": true,
   "scripts": {
     "dev": "next dev",

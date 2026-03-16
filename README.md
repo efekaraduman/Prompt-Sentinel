@@ -358,3 +358,30 @@ See [DEPLOYMENT_CHECKLIST.md](DEPLOYMENT_CHECKLIST.md) for the full production o
 | Org/team support | — | — | ✓ |
 | SIEM webhooks | — | — | ✓ |
 | Medium-risk passthrough | — | — | ✓ |
+
+---
+
+## Security Notice
+
+> **This project is a functional portfolio / prototype.**
+> It is suitable for self-hosted research, local security testing, and evaluation deployments. Before using PromptSentinel to process real user traffic or sensitive system prompts, consider the following:
+
+- **Harden before production.** Work through [DEPLOYMENT_CHECKLIST.md](DEPLOYMENT_CHECKLIST.md) end-to-end. Pay particular attention to `PROMPTSENTINEL_API_KEY`, TLS termination, persistent volume configuration, and Stripe webhook verification.
+- **Never commit secrets.** API keys, Stripe credentials, and SMTP passwords belong in environment variables or a secrets manager — not in source code or `.env` files checked into git. See [`.env.example`](.env.example) for the full list.
+- **SQLite is single-writer.** Suitable for low-to-medium traffic on a single node. For high write throughput or clustering, the PostgreSQL migration path (Phase E6) is planned.
+- **Detection is rule-based.** All guard detectors use regex, n-gram patterns, and allowlist enforcement — no ML models. This makes behaviour deterministic and auditable, but means novel obfuscation techniques not in the pattern library may not be caught.
+- **Rotate keys after exposure.** If `PROMPTSENTINEL_API_KEY` or any credential is ever committed or leaked, rotate it immediately. The app does not validate key strength — use at least 32 bytes of cryptographic randomness (`python -c "import secrets; print(secrets.token_hex(32))"`).
+
+---
+
+## Support
+
+- **Bug reports and feature requests:** [Open an issue](../../issues) on GitHub.
+- **Questions:** Use [GitHub Discussions](../../discussions) for general questions about setup, deployment, or extending the platform.
+- **Security vulnerabilities:** Please do not open a public issue for security-sensitive findings. Open a private security advisory via the GitHub Security tab instead.
+
+---
+
+## License
+
+[MIT](LICENSE)
