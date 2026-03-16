@@ -1,6 +1,5 @@
 # PromptSentinel — Internal Architecture Brief
 
-> Classification: Internal Engineering Document — Not for External Distribution
 > Version: 0.3.0 | Updated: 2026-03-10
 
 ---
