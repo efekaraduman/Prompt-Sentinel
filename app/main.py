@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import csv
+import hmac
 import io
 import json
 import logging
@@ -208,8 +209,11 @@ async def security_headers_middleware(request: Request, call_next: Any) -> Any:
     response.headers.setdefault("X-Frame-Options", "DENY")
     response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
     response.headers.setdefault("X-XSS-Protection", "1; mode=block")
-    # Strict-Transport-Security only in production (HTTPS)
-    if os.environ.get("ENVIRONMENT") == "production":
+    # Strict-Transport-Security: send in production OR when HTTPS env flag is set.
+    # Never send HSTS over plain HTTP (breaks dev) — only when ENVIRONMENT=production or HTTPS=1.
+    _env = os.environ.get("ENVIRONMENT", "")
+    _force_https = os.environ.get("HTTPS", "0") not in ("0", "", "false", "False")
+    if _env == "production" or _force_https:
         response.headers.setdefault(
             "Strict-Transport-Security", "max-age=31536000; includeSubDomains"
         )
@@ -242,7 +246,7 @@ async def identity_middleware(request: Request, call_next: Any) -> Any:
     admin_key = os.environ.get("PROMPTSENTINEL_API_KEY")
 
     if api_key:
-        if admin_key and api_key == admin_key:
+        if admin_key and hmac.compare_digest(api_key, admin_key):
             request.state.user_plan = "pro"
         else:
             try:
@@ -363,8 +367,8 @@ async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONR
         status_code=500,
         content={
             "error": {
-                "type": exc.__class__.__name__,
-                "message": "Internal server error",
+                "type": "internal_error",
+                "message": "An unexpected error occurred. Please contact support if this persists.",
             }
         },
     )
@@ -640,7 +644,7 @@ async def guard_analytics_trend(
 @app.get("/analytics/org/trend", response_model=OrgTrendResponse)
 async def analytics_org_trend(
     request: Request,
-    days: int = Query(default=7),
+    days: int = Query(default=7, ge=1, le=30),
     x_api_key: str | None = Header(default=None),
     session: Session = Depends(get_session),
     _role: object = Depends(require_min_role("viewer")),
@@ -967,8 +971,11 @@ async def org_list_users(
     """List all users in the caller's organisation (viewer+ role)."""
     from .models import User as UserModel
 
+    _org_id = getattr(_role, "org_id", None)
+    if _org_id is None:
+        raise HTTPException(status_code=403, detail="User must belong to an organisation")
     users = session.exec(
-        select(UserModel).where(UserModel.org_id == admin.org_id)
+        select(UserModel).where(UserModel.org_id == _org_id)
     ).all()
     return [
         UserSafeResponse(id=u.id, email=u.email, created_at=u.created_at, is_active=u.is_active, plan=u.plan)
@@ -2065,7 +2072,11 @@ async def export_campaign(
     cat_risk: Dict[str, List[int]] = {}
     for f in findings:
         cat_risk.setdefault(f.category, []).append(f.risk_score)
-    top_categories = sorted(cat_risk.keys(), key=lambda c: sum(cat_risk[c]) / len(cat_risk[c]), reverse=True)
+    top_categories = sorted(
+        (c for c in cat_risk.keys() if cat_risk[c]),  # guard against empty lists (ZeroDivisionError)
+        key=lambda c: sum(cat_risk[c]) / len(cat_risk[c]),
+        reverse=True,
+    )
 
     summary = {
         "top_categories": top_categories,
@@ -2454,7 +2465,7 @@ async def upgrade_banner(
 @app.get("/threats/trend", response_model=OrgThreatTrendResponse)
 async def threats_trend(
     request: Request,
-    days: int = Query(default=7),
+    days: int = Query(default=7, ge=1, le=30),
     x_api_key: str | None = Header(default=None),
     session: Session = Depends(get_session),
     _role: object = Depends(require_min_role("viewer")),

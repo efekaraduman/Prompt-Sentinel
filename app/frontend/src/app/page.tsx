@@ -7,7 +7,7 @@ import RiskCard from "../../components/RiskCard";
 import TrustScoreCard from "../../components/TrustScoreCard";
 import TestTable from "../../components/TestTable";
 import CampaignFindingsTable from "../../components/CampaignFindingsTable";
-import { createCheckoutSession, getCampaign, getFindings, runTest, startCampaign, stopCampaign, UpgradeRequiredError } from "../../lib/api";
+import { createCheckoutSession, getCampaign, getFindings, runTest, safeExternalRedirect, startCampaign, stopCampaign, UpgradeRequiredError } from "../../lib/api";
 import type {
   CampaignStatus,
   CampaignStatusResponse,
@@ -192,7 +192,7 @@ export default function Home() {
     setUpgradeLoading(true);
     try {
       const { checkout_url } = await createCheckoutSession(apiKey);
-      window.location.href = checkout_url;
+      safeExternalRedirect(checkout_url);
     } catch (e) {
       setUpgradeError(e instanceof Error ? e.message : "Checkout failed");
       setUpgradeLoading(false);
@@ -258,6 +258,7 @@ export default function Home() {
     }
 
     let cancelled = false;
+    const controller = new AbortController();
 
     const poll = async () => {
       try {
@@ -266,7 +267,7 @@ export default function Home() {
           setCampaign(latest);
         }
       } catch (err) {
-        if (!cancelled) {
+        if (!cancelled && (err as { name?: string }).name !== "AbortError") {
           const message =
             err instanceof Error ? err.message : "Unexpected error while polling campaign.";
           setCampaignError(message);
@@ -280,6 +281,7 @@ export default function Home() {
 
     return () => {
       cancelled = true;
+      controller.abort();
       clearInterval(intervalId);
     };
   }, [campaign?.campaign_id, campaign?.status]);

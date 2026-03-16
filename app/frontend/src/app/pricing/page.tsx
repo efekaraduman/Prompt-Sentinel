@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { startProCheckout, createPortalSession, getMe } from "../../../lib/api";
+import { startProCheckout, createPortalSession, getMe, safeExternalRedirect } from "../../../lib/api";
 import type { MeResponse } from "../../../lib/types";
 
 // ---------------------------------------------------------------------------
@@ -85,7 +85,7 @@ export default function PricingPage() {
     setError(null);
     try {
       const { checkout_url } = await startProCheckout(apiKey);
-      window.location.href = checkout_url;
+      safeExternalRedirect(checkout_url);
     } catch (e: unknown) {
       const raw = e instanceof Error ? e.message : "Checkout failed";
       if (raw === "already_pro" || raw.toLowerCase().includes("already")) {
@@ -109,7 +109,7 @@ export default function PricingPage() {
     setError(null);
     try {
       const { url } = await createPortalSession(apiKey);
-      window.location.href = url;
+      safeExternalRedirect(url);
     } catch (e: unknown) {
       const raw = e instanceof Error ? e.message : "";
       if (raw.toLowerCase().includes("not configured") || raw.toLowerCase().includes("not available") || raw.toLowerCase().includes("not installed")) {

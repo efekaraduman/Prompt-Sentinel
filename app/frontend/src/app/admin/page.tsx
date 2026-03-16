@@ -636,8 +636,11 @@ export default function AdminPage() {
         method: "POST",
         headers: apiKey ? { "X-API-Key": apiKey } : {},
       });
-      const data: { ok?: boolean; created?: number; error?: { message: string } } = await res.json();
-      if (!res.ok) throw new Error(data.error?.message ?? `Error ${res.status}`);
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({})) as { error?: { message: string } };
+        throw new Error(errData.error?.message ?? `Error ${res.status}`);
+      }
+      const data: { ok?: boolean; created?: number } = await res.json();
       const created = data.created ?? 0;
       setSeedBanner({
         ok: true,

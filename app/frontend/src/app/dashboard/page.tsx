@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { createCheckoutSession, createPortalSession, getAnomalies, getDashboardSummary, getGuardAnalytics, getGuardTrend, getGuardHistory, getMe, getMeUsage, getPerformanceAnalytics, getRecentCampaigns, getRiskTrend, getScorecard, getTopThreats, getUsageStatus, getUsageSummary, replayGuardScan } from "../../../lib/api";
+import { createCheckoutSession, createPortalSession, getAnomalies, getDashboardSummary, getGuardAnalytics, getGuardTrend, getGuardHistory, getMe, getMeUsage, getPerformanceAnalytics, getRecentCampaigns, getRiskTrend, getScorecard, getTopThreats, getUsageStatus, getUsageSummary, replayGuardScan, safeExternalRedirect } from "../../../lib/api";
 import type { AnomalyAlertItem, DailyCountPoint, DashboardSummary, GuardAnalyticsResponse, GuardHistoryItem, GuardReplayResponse, MeResponse, MeUsageResponse, PerformanceAnalyticsResponse, RecentCampaignItem, RiskTrendItem, SecurityScorecardResponse, ThreatSignatureItem, ThreatTrendResponse, UsageStatus, UsageSummary } from "../../../lib/types";
 
 function UpgradeButton() {
@@ -21,7 +21,7 @@ function UpgradeButton() {
     setLoading(true);
     try {
       const { checkout_url } = await createCheckoutSession(apiKey);
-      window.location.href = checkout_url;
+      safeExternalRedirect(checkout_url);
     } catch (e) {
       const raw = e instanceof Error ? e.message : "Checkout failed";
       const isAlreadyPro =
@@ -272,7 +272,7 @@ export default function DashboardPage() {
     setPortalLoading(true);
     try {
       const { url } = await createPortalSession(apiKey);
-      window.location.href = url;
+      safeExternalRedirect(url);
     } catch (e) {
       const raw = e instanceof Error ? e.message : "";
       if (raw.toLowerCase().includes("not configured") || raw.toLowerCase().includes("not available") || raw.toLowerCase().includes("not installed")) {
@@ -789,7 +789,7 @@ export default function DashboardPage() {
           if (!apiKey) return;
           try {
             const { checkout_url } = await createCheckoutSession(apiKey);
-            window.location.href = checkout_url;
+            safeExternalRedirect(checkout_url);
           } catch { /* ignore */ }
         }} />
       )}

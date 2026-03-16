@@ -86,17 +86,19 @@ export default function TrustPage() {
 
   useEffect(() => {
     const base = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
-    Promise.all([
+    // Use allSettled so one failing request doesn't suppress the other
+    Promise.allSettled([
       fetch(`${base}/api/trust/status`).then((r) => r.ok ? r.json() : Promise.reject(new Error(`status ${r.status}`))),
       fetch(`${base}/api/trust/capabilities`).then((r) => r.ok ? r.json() : Promise.reject(new Error(`status ${r.status}`))),
     ])
-      .then(([s, c]) => {
-        setStatus(s as TrustStatus);
-        setCapabilities((c as { capabilities: CapabilityItem[] }).capabilities ?? []);
-      })
-      .catch(() => {
-        // Static content still renders; indicate live data is unavailable
-        setFetchError(true);
+      .then(([statusResult, capResult]) => {
+        if (statusResult.status === "fulfilled") setStatus(statusResult.value as TrustStatus);
+        if (capResult.status === "fulfilled") {
+          setCapabilities((capResult.value as { capabilities: CapabilityItem[] }).capabilities ?? []);
+        }
+        if (statusResult.status === "rejected" && capResult.status === "rejected") {
+          setFetchError(true); // only show error when both fail
+        }
       })
       .finally(() => setLoading(false));
   }, []);

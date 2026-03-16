@@ -96,7 +96,8 @@ def _upsert_signature(
             session.add(row)
             session.commit()
             return 1
-    except Exception:
+    except Exception as _sig_exc:
+        logger.warning("_upsert_signature: failed to persist sig_hash=%s — %s", sig_hash, _sig_exc)
         return 0
 
 

@@ -83,20 +83,48 @@ async function parseOrThrow<T>(response: Response): Promise<T> {
 /**
  * Build auth headers for every API call.
  * Priority: explicit apiKey param → localStorage token (Bearer) → localStorage apiKey (X-API-Key).
+ * Keys longer than 512 chars are rejected to prevent header injection / oversized requests.
  */
 function buildHeaders(apiKey?: string): Record<string, string> {
   const h: Record<string, string> = { "Accept": "application/json" };
+  const MAX_KEY_LEN = 512;
   if (apiKey) {
+    if (apiKey.length > MAX_KEY_LEN) throw new Error("API key exceeds maximum length");
     h["X-API-Key"] = apiKey;
     return h;
   }
   if (typeof window !== "undefined") {
     const token = localStorage.getItem("token");
-    if (token) { h["Authorization"] = `Bearer ${token}`; return h; }
+    if (token && token.length <= MAX_KEY_LEN) { h["Authorization"] = `Bearer ${token}`; return h; }
     const key = localStorage.getItem("apiKey");
-    if (key) { h["X-API-Key"] = key; }
+    if (key && key.length <= MAX_KEY_LEN) { h["X-API-Key"] = key; }
   }
   return h;
+}
+
+/**
+ * Safely redirect to an external URL from an API response.
+ * Only allows redirects to the same origin or to approved Stripe domains.
+ * Throws if the URL is from an unexpected domain (open-redirect guard).
+ */
+export function safeExternalRedirect(url: string): void {
+  const ALLOWED_HOSTS = ["checkout.stripe.com", "billing.stripe.com", "payments.stripe.com"];
+  try {
+    const parsed = new URL(url);
+    const isAllowed =
+      parsed.origin === window.location.origin ||
+      ALLOWED_HOSTS.some((h) => parsed.hostname === h);
+    if (!isAllowed) {
+      console.error("[PromptSentinel] Blocked unsafe redirect to:", parsed.origin);
+      throw new Error("Redirect to disallowed domain blocked");
+    }
+    window.location.href = parsed.toString();
+  } catch (e) {
+    if (e instanceof TypeError) {
+      throw new Error("Invalid redirect URL received from server");
+    }
+    throw e;
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -435,7 +463,11 @@ export async function getGuardHistory(
     method: "GET",
     headers: buildHeaders(apiKey),
   });
-  return parseOrThrow<import("./types").GuardHistoryItem[]>(response);
+  const data = await parseOrThrow<
+    import("./types").GuardHistoryItem[] | { items: import("./types").GuardHistoryItem[] }
+  >(response);
+  // API returns paginated envelope { items, total, page, page_size }
+  return Array.isArray(data) ? data : (data.items ?? []);
 }
 
 /** PHASE 2.19 — replay a past scan */
@@ -499,5 +531,22 @@ export async function getAnomalies(
     method: "GET",
     headers: buildHeaders(apiKey),
   });
-  return parseOrThrow<import("./types").AnomalyAlertResponse>(response);
+  // Backend returns { window_days, anomalies: [{metric, date, ...}] }
+  // Normalise to the frontend AnomalyAlertResponse shape: { days, alerts: [{metric, day, ...}] }
+  const raw = await parseOrThrow<{
+    window_days?: number;
+    days?: number;
+    anomalies?: Array<{ metric: string; date?: string; day?: string; value: number; baseline_mean: number; baseline_std: number; z_score: number; severity: string }>;
+    alerts?: import("./types").AnomalyAlertItem[];
+  }>(response);
+  const alerts: import("./types").AnomalyAlertItem[] = (raw.alerts ?? raw.anomalies ?? []).map((a) => ({
+    metric: a.metric,
+    day: (a as { day?: string; date?: string }).day ?? (a as { day?: string; date?: string }).date ?? "",
+    value: a.value,
+    baseline_mean: a.baseline_mean,
+    baseline_std: a.baseline_std,
+    z_score: a.z_score,
+    severity: a.severity as import("./types").AnomalyAlertItem["severity"],
+  }));
+  return { alerts, days: raw.days ?? raw.window_days ?? days };
 }
