@@ -8,7 +8,7 @@ Maliyet: **Ücretsiz** (Railway + Vercel free tier)
 ## Hazırlanan API Anahtarı
 
 ```
-PROMPTSENTINEL_API_KEY=b347ec09344e3eef5d67eb468b5bc19b06d6fe6b341999722df67f85494b2d9d
+PROMPTSENTINEL_API_KEY=<your-api-key>
 ```
 Bu değeri aşağıdaki adımlarda kullanacaksın.
 
@@ -48,7 +48,7 @@ Railway Dashboard → projeye tıkla → "Variables" sekmesi → "New Variable":
 
 | KEY | VALUE |
 |-----|-------|
-| `PROMPTSENTINEL_API_KEY` | `b347ec09344e3eef5d67eb468b5bc19b06d6fe6b341999722df67f85494b2d9d` |
+| `PROMPTSENTINEL_API_KEY` | `<your-api-key>` |
 | `PROMPTSENTINEL_DB_PATH` | `/data/promptsentinel.db` |
 | `PROMPTSENTINEL_CORS_ORIGINS` | *(şimdilik boş bırak, Vercel URL'ini sonra ekleyeceksin)* |
 | `LOG_LEVEL` | `INFO` |
@@ -107,7 +107,7 @@ URL: https://promptsentinel.vercel.app
 
 Admin erişimi için:
 1. Sağ üstteki "Session" butonuna tıkla
-2. API Key: b347ec09344e3eef5d67eb468b5bc19b06d6fe6b341999722df67f85494b2d9d
+2. API Key: <your-api-key>
 3. Enter'a bas
 
 Erişim:

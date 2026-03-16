@@ -3,7 +3,7 @@
   "configurations": [
     {
       "name": "frontend",
-      "runtimeExecutable": "C:\\Users\\efe\\node.exe",
+      "runtimeExecutable": "node",
       "runtimeArgs": ["app/frontend/node_modules/next/dist/bin/next", "dev", "app/frontend"],
       "port": 3000
     }

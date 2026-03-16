@@ -17,6 +17,7 @@ build/
 lock_test.db
 
 # Logs
+logs/
 *.log
 *.err
 uvicorn.log
