@@ -272,6 +272,15 @@ async def identity_middleware(request: Request, call_next: Any) -> Any:
 def on_startup() -> None:
     """Initialise database schema on application startup."""
     init_db()
+    # In demo mode, auto-seed on every startup so ephemeral deployments
+    # (Render free tier, etc.) always have data visible without manual seeding.
+    if get_settings().get("demo_mode"):
+        from .demo_seed import seed_demo
+        from .db import engine as _engine
+        from sqlmodel import Session as _Session
+        with _Session(_engine) as _s:
+            n = seed_demo(_s)
+        logger.info("demo-mode startup seed: %d campaigns inserted", n)
 
 
 @app.exception_handler(RequestValidationError)

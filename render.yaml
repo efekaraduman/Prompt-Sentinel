@@ -1,0 +1,44 @@
+# Render deployment config — PromptSentinel backend (public demo)
+# https://render.com/docs/infrastructure-as-code
+#
+# Deploy steps:
+#   1. Push repo to GitHub
+#   2. render.com → New → Blueprint → select this repo
+#   3. Render reads this file, creates the service, generates PROMPTSENTINEL_API_KEY
+#   4. After first deploy, add PROMPTSENTINEL_CORS_ORIGINS (your frontend URL)
+#
+# The backend auto-seeds demo data on every startup when PROMPTSENTINEL_DEMO_MODE=1.
+# No manual seeding needed.
+
+services:
+  - type: web
+    name: promptsentinel-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    # Override Dockerfile CMD to inject Render's $PORT at runtime
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 1 --log-level info
+    healthCheckPath: /health
+    envVars:
+      # Auto-generated strong random key — copy from Render dashboard after deploy
+      - key: PROMPTSENTINEL_API_KEY
+        generateValue: true
+
+      # Public read-only demo mode — blocks mutations, auto-seeds data on startup
+      - key: PROMPTSENTINEL_DEMO_MODE
+        value: "1"
+
+      # Rate limiting — 60 req/min per IP (prevents abuse on public URL)
+      - key: PROMPTSENTINEL_RATE_LIMIT_PER_MIN
+        value: "60"
+
+      # Ephemeral SQLite path — survives the process lifetime; re-seeded on restart
+      - key: PROMPTSENTINEL_DB_PATH
+        value: /tmp/promptsentinel.db
+
+      # Set after frontend is deployed: e.g. https://promptsentinel.vercel.app
+      # Leave empty to allow only localhost origins during initial setup.
+      - key: PROMPTSENTINEL_CORS_ORIGINS
+        value: ""
+
+      - key: LOG_LEVEL
+        value: INFO
