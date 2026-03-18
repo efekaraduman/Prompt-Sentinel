@@ -26,18 +26,6 @@ Backend API health: [`/health`](https://promptsentinel-api.onrender.com/health)
 
 ---
 
-## Screenshots
-
-<!-- Add your screenshots to the assets/ folder and uncomment the lines below -->
-<!-- ![Dashboard](assets/dashboard.png) -->
-<!-- ![Threat Analytics](assets/threat-analytics.png) -->
-<!-- ![Pricing](assets/pricing.png) -->
-<!-- ![Trust Center](assets/trust.png) -->
-
-*Screenshots coming soon — run locally or visit the [live demo](https://promptsentinel-fronted.vercel.app) to explore.*
-
----
-
 ## What PromptSentinel Does
 
 Two complementary capabilities, one platform:
