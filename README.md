@@ -18,6 +18,26 @@ These attack surfaces are model-agnostic, unbounded, and invisible to traditiona
 
 ---
 
+## Live Demo
+
+> **[Live Demo →](https://promptsentinel-fronted.vercel.app)** — Public read-only instance (demo / portfolio). Campaign creation, sign-up, and billing are disabled.
+
+Backend API health: [`/health`](https://promptsentinel-api.onrender.com/health)
+
+---
+
+## Screenshots
+
+<!-- Add your screenshots to the assets/ folder and uncomment the lines below -->
+<!-- ![Dashboard](assets/dashboard.png) -->
+<!-- ![Threat Analytics](assets/threat-analytics.png) -->
+<!-- ![Pricing](assets/pricing.png) -->
+<!-- ![Trust Center](assets/trust.png) -->
+
+*Screenshots coming soon — run locally or visit the [live demo](https://promptsentinel-fronted.vercel.app) to explore.*
+
+---
+
 ## What PromptSentinel Does
 
 Two complementary capabilities, one platform:
@@ -121,6 +141,7 @@ python -m venv venv
 venv\Scripts\pip install -r requirements.txt
 
 # Linux / macOS
+source venv/bin/activate
 pip install -r requirements.txt
 cd ..
 
@@ -290,12 +311,17 @@ See [`.env.example`](.env.example) for the full annotated list.
 ├── tests/
 │   ├── run_golden.py        # 188 golden + regression tests (offline)
 │   └── test_siem.py         # 34 SIEM unit tests
-├── start.sh                 # Linux/macOS start script
+├── assets/                  # Screenshots and media
+├── scripts/                 # Utility scripts
 ├── Dockerfile               # Multi-stage Docker build (non-root user)
-├── railway.toml             # Railway deployment config
+├── render.yaml              # Render deployment config
+├── start.sh                 # Linux/macOS start script
 ├── .env.example             # All environment variables with descriptions
 ├── DEPLOYMENT_CHECKLIST.md  # Full production ops runbook
-└── FINAL_READINESS.md       # Known limitations and launch checklist
+├── FINAL_READINESS.md       # Known limitations and launch checklist
+├── DEVELOPER_GUIDE.md       # Quick-reference developer guide
+├── HANDOFF.md               # Developer handoff document
+└── CHANGELOG.md             # Version history
 ```
 
 ---
@@ -407,26 +433,6 @@ export PROMPTSENTINEL_DEMO_MODE=1
 
 ---
 
-## Live Demo
-
-> **[Live Demo →](https://promptsentinel-fronted.vercel.app)** — Public read-only instance (demo / portfolio). Campaign creation, sign-up, and billing are disabled.
-
-Backend API health: [`/health`](https://promptsentinel-api.onrender.com/health)
-
----
-
-## Screenshots
-
-<!-- Add your screenshots to the assets/ folder and uncomment the lines below -->
-<!-- ![Dashboard](assets/dashboard.png) -->
-<!-- ![Threat Analytics](assets/threat-analytics.png) -->
-<!-- ![Pricing](assets/pricing.png) -->
-<!-- ![Trust Center](assets/trust.png) -->
-
-*Screenshots coming soon — run locally or visit the [live demo](https://promptsentinel-fronted.vercel.app) to explore.*
-
----
-
 ## Known Limitations
 
 | Limitation | Impact | Notes |
@@ -460,7 +466,7 @@ See [FINAL_READINESS.md](FINAL_READINESS.md) for the full limitations and pre-la
 
 See [DEPLOYMENT_CHECKLIST.md](DEPLOYMENT_CHECKLIST.md) for the full production ops runbook covering env vars, TLS, secrets, volume mounts, backups, health checks, Stripe setup, and rollback steps.
 
-**Quick deploy (Railway + Vercel):** See [DEPLOY.md](DEPLOY.md) for a step-by-step 15-minute guide.
+**Quick deploy (Render + Vercel):** See [DEPLOY.md](DEPLOY.md) for a step-by-step guide.
 
 ---
 
