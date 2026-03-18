@@ -260,7 +260,7 @@ export default function DashboardPage() {
   const [perfAnalytics, setPerfAnalytics] = useState<PerformanceAnalyticsResponse | null>(null); // PHASE 2.22
   const [scorecard, setScorecard] = useState<SecurityScorecardResponse | null>(null); // PHASE 2.29
   const [replayResults, setReplayResults] = useState<Record<number, GuardReplayResponse | "loading" | "error">>({});
-  const [hasApiKey, setHasApiKey] = useState(false);
+  const [hasApiKey, setHasApiKey] = useState(process.env.NEXT_PUBLIC_DEMO_MODE === "1");
   const [portalLoading, setPortalLoading] = useState(false);
   const [portalError, setPortalError] = useState<string | null>(null);
   const [billingBanner, setBillingBanner] = useState<"success" | "cancel" | null>(null);
