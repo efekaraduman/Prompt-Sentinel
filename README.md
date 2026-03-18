@@ -2,6 +2,8 @@
 
 **PromptSentinel** is a self-hostable LLM security platform that combines automated red-team testing with runtime prompt-injection protection. It runs systematic adversarial campaigns against system prompts, scores every finding, and guards production LLM traffic in real-time — all from a single deployable artifact with no ML inference dependency.
 
+> This project is not affiliated with any other repository or company using a similar name.
+
 ---
 
 ## The Problem
@@ -403,7 +405,25 @@ export PROMPTSENTINEL_RATE_LIMIT_PER_MIN=60
 export PROMPTSENTINEL_DEMO_MODE=1
 ```
 
-> **Screenshots / GIF** — coming soon.
+---
+
+## Live Demo
+
+> **[Live Demo →](https://promptsentinel-fronted.vercel.app)** — Public read-only instance (demo / portfolio). Campaign creation, sign-up, and billing are disabled.
+
+Backend API health: [`/health`](https://promptsentinel-api.onrender.com/health)
+
+---
+
+## Screenshots
+
+<!-- Add your screenshots to the assets/ folder and uncomment the lines below -->
+<!-- ![Dashboard](assets/dashboard.png) -->
+<!-- ![Threat Analytics](assets/threat-analytics.png) -->
+<!-- ![Pricing](assets/pricing.png) -->
+<!-- ![Trust Center](assets/trust.png) -->
+
+*Screenshots coming soon — run locally or visit the [live demo](https://promptsentinel-fronted.vercel.app) to explore.*
 
 ---
 
