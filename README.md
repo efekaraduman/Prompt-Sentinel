@@ -1,6 +1,20 @@
-# PromptSentinel
+<p align="center">
+  <img src="assets/banner.svg" alt="PromptSentinel — Runtime Guard + Red-Team for LLM Security" width="100%"/>
+</p>
 
-**PromptSentinel** is a self-hostable LLM security platform that combines automated red-team testing with runtime prompt-injection protection. It runs systematic adversarial campaigns against system prompts, scores every finding, and guards production LLM traffic in real-time — all from a single deployable artifact with no ML inference dependency.
+<p align="center">
+  <strong>Self-hostable LLM security platform</strong> — automated red-team testing + runtime prompt-injection protection.<br/>
+  No ML inference dependency. Deterministic. Rule-based. One deployable artifact.
+</p>
+
+<p align="center">
+  <a href="https://promptsentinel-fronted.vercel.app"><strong>Live Demo →</strong></a>&nbsp;&nbsp;·&nbsp;&nbsp;
+  <a href="https://promptsentinel-api.onrender.com/health">API Health</a>&nbsp;&nbsp;·&nbsp;&nbsp;
+  <a href="#getting-started">Quick Start</a>&nbsp;&nbsp;·&nbsp;&nbsp;
+  <a href="DEPLOYMENT_CHECKLIST.md">Deploy Guide</a>
+</p>
+
+---
 
 > This project is not affiliated with any other repository or company using a similar name.
 
@@ -15,14 +29,6 @@ LLM applications accept natural-language input with no compile-time safety guara
 - Poison RAG pipelines via injected retrieved documents
 
 These attack surfaces are model-agnostic, unbounded, and invisible to traditional application security tooling.
-
----
-
-## Live Demo
-
-> **[Live Demo →](https://promptsentinel-fronted.vercel.app)** — Public read-only instance (demo / portfolio). Campaign creation, sign-up, and billing are disabled.
-
-Backend API health: [`/health`](https://promptsentinel-api.onrender.com/health)
 
 ---
 
@@ -72,25 +78,9 @@ Both capabilities share a **threat intelligence layer** — signatures, MinHash 
 
 ## Architecture
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                   SaaS Platform Layer                    │
-│  Auth · Billing · Orgs · Usage Metering · Rate Limiting │
-├──────────────────┬──────────────────┬───────────────────┤
-│ Runtime          │ Red-Team         │ Enterprise        │
-│ Protection       │ Testing          │ Analytics         │
-│                  │                  │                   │
-│ Guard pipeline   │ Campaign engine  │ Signatures        │
-│ Detectors (7)    │ Red agent        │ Clustering        │
-│ Policy engine    │ Attack strategies│ Anomaly detection │
-│ Risk scoring     │ Obfuscation      │ SIEM export       │
-│ Sync + async     │ Multi-turn chains│ Threat graphs     │
-│ Decision logic   │ Metrics + export │ Model profiling   │
-├──────────────────┴──────────────────┴───────────────────┤
-│                    Storage Layer                         │
-│         SQLite (WAL) · 20+ tables · SQLModel ORM        │
-└─────────────────────────────────────────────────────────┘
-```
+<p align="center">
+  <img src="assets/architecture.svg" alt="PromptSentinel Architecture" width="100%"/>
+</p>
 
 ### Backend Stack
 | Component | Technology |
