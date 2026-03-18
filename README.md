@@ -10,8 +10,6 @@
 
 > **[Live Demo →](https://promptsentinel-fronted.vercel.app)** — Public read-only instance (demo / portfolio). Campaign creation, sign-up, and billing are disabled.
 
-Backend API health: [`/health`](https://promptsentinel-api.onrender.com/health)
-
 ---
 
 ## The Problem
