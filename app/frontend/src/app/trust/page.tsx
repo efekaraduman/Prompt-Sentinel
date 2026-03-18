@@ -85,11 +85,12 @@ export default function TrustPage() {
   const [fetchError, setFetchError] = useState(false);
 
   useEffect(() => {
-    const base = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
-    // Use allSettled so one failing request doesn't suppress the other
+    // Always use the Next.js proxy (/api/*) — never call the backend directly
+    // from client components; direct calls break CSP (connect-src 'self') and
+    // CORS on Vercel deployments.
     Promise.allSettled([
-      fetch(`${base}/api/trust/status`).then((r) => r.ok ? r.json() : Promise.reject(new Error(`status ${r.status}`))),
-      fetch(`${base}/api/trust/capabilities`).then((r) => r.ok ? r.json() : Promise.reject(new Error(`status ${r.status}`))),
+      fetch(`/api/trust/status`).then((r) => r.ok ? r.json() : Promise.reject(new Error(`status ${r.status}`))),
+      fetch(`/api/trust/capabilities`).then((r) => r.ok ? r.json() : Promise.reject(new Error(`status ${r.status}`))),
     ])
       .then(([statusResult, capResult]) => {
         if (statusResult.status === "fulfilled") setStatus(statusResult.value as TrustStatus);
