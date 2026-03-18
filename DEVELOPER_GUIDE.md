@@ -1,6 +1,6 @@
-# PromptSentinel — Claude Session Handoff
+# PromptSentinel — Developer Guide
 
-> Token-efficient continuation brief. Full architecture: `PROMPTSENTINEL_MASTER_CONTEXT.md`
+> Quick-reference continuation brief. Full architecture: `PROMPTSENTINEL_MASTER_CONTEXT.md`
 
 ---
 

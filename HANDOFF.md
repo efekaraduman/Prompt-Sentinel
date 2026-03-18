@@ -1,8 +1,8 @@
-# PromptSentinel — Claude Handoff Document
+# PromptSentinel — Developer Handoff
 
 _Last updated: 2026-03-18_
 
-This document captures the key context an AI assistant (or new developer) needs to continue working on this project.
+This document captures the key context a new developer needs to continue working on this project.
 
 ---
 
@@ -70,7 +70,7 @@ raise HTTPException(status_code=4xx, detail={"type": "...", "message": "Human-re
 | Frontend | Vercel | Root dir = `app/frontend`, env: `NEXT_PUBLIC_API_BASE_URL`, `NEXT_PUBLIC_DEMO_MODE` |
 
 ### Important Notes
-- Vercel Hobby plan: commits must have a GitHub-associated author (no unknown `Co-Authored-By`)
+- Vercel Hobby plan: commits must have a GitHub-associated author
 - Render free tier: ephemeral filesystem, DB re-seeds on every restart
 - `--workers 1` required unless `REDIS_URL` is set
 
