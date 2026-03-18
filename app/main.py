@@ -396,13 +396,13 @@ def require_not_demo() -> None:
     excluded so visitors can still explore the product.
     """
     if get_settings().get("demo_mode"):
+        # Use detail={"type":..., "message":...} so parseOrThrow() in lib/api.ts
+        # can extract detail.message and show a friendly error (not a raw 403).
         raise HTTPException(
             status_code=403,
             detail={
-                "error": {
-                    "type": "demo_mode",
-                    "message": "This action is disabled in demo mode. Deploy your own instance to use this feature.",
-                }
+                "type": "demo_mode",
+                "message": "This action is disabled in demo mode. Deploy your own instance to use this feature.",
             },
         )
 

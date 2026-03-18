@@ -141,6 +141,12 @@ def require_min_role(min_role: str):
             return None
 
         if not resolved_key:
+            # Demo mode — allow unauthenticated public access for viewer-level
+            # endpoints (dashboard, analytics, trust, guard history reads).
+            # Mutations are already blocked by require_not_demo() before this runs.
+            from .config import get_settings
+            if get_settings().get("demo_mode") and min_level <= ROLE_HIERARCHY["viewer"]:
+                return None
             raise InsufficientRoleError()
 
         user = session.exec(

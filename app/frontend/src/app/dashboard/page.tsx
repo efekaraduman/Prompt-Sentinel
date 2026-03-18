@@ -329,7 +329,10 @@ export default function DashboardPage() {
     }
 
     const apiKey = localStorage.getItem("apiKey") ?? undefined;
-    setHasApiKey(!!apiKey);
+    // In demo mode, bypass the "not logged in" gate so public visitors
+    // can see the seeded dashboard data without any credentials.
+    const isDemoMode = process.env.NEXT_PUBLIC_DEMO_MODE === "1";
+    setHasApiKey(!!apiKey || isDemoMode);
     const safeThreats = getTopThreats(5, apiKey).catch(() => null);
     const safeTrend = getRiskTrend(10, apiKey).catch(() => null);
     const safeMe = getMe(apiKey).catch(() => null);
