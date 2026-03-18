@@ -374,6 +374,30 @@ async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONR
     )
 
 
+# ---------------------------------------------------------------------------
+# Demo-mode guard dependency
+# ---------------------------------------------------------------------------
+
+def require_not_demo() -> None:
+    """Raise 403 when the server is running in read-only demo mode.
+
+    Attach as a FastAPI dependency to any endpoint that mutates state or
+    triggers external calls (billing, auth, campaign creation, etc.).
+    Safe read-only endpoints and ``POST /guard/scan`` are intentionally
+    excluded so visitors can still explore the product.
+    """
+    if get_settings().get("demo_mode"):
+        raise HTTPException(
+            status_code=403,
+            detail={
+                "error": {
+                    "type": "demo_mode",
+                    "message": "This action is disabled in demo mode. Deploy your own instance to use this feature.",
+                }
+            },
+        )
+
+
 @app.get("/dashboard/summary", response_model=DashboardSummaryResponse)
 async def dashboard_summary(
     session: Session = Depends(get_session),
@@ -1651,6 +1675,7 @@ async def create_campaign(
     response: Response,
     x_api_key: str | None = Header(default=None),
     session: Session = Depends(get_session),
+    _demo: None = Depends(require_not_demo),
     _role: object = Depends(require_min_role("analyst")),
     _rl: None = Depends(require_rate_limit_campaigns),
     user: object = Depends(get_current_user),
@@ -1958,6 +1983,7 @@ async def stop_campaign(
     campaign_id: int,
     request: Request,
     session: Session = Depends(get_session),
+    _demo: None = Depends(require_not_demo),
     _role: object = Depends(require_min_role("analyst")),
     _rl: None = Depends(require_rate_limit_campaigns),
 ) -> CampaignStatusResponse:
@@ -2104,6 +2130,7 @@ async def export_campaign(
 async def auth_signup(
     payload: SignupRequest,
     session: Session = Depends(get_session),
+    _demo: None = Depends(require_not_demo),
 ) -> TokenResponse:
     """Register a new user with email + password. Returns a session token."""
     import secrets
@@ -2131,6 +2158,7 @@ async def auth_signup(
 async def auth_login_password(
     payload: PasswordLoginRequest,
     session: Session = Depends(get_session),
+    _demo: None = Depends(require_not_demo),
 ) -> TokenResponse:
     """Authenticate with email + password (legacy). Returns a session token."""
     from .auth import verify_password, create_session_token
@@ -2149,6 +2177,7 @@ async def auth_login_password(
 async def auth_magic_login(
     payload: LoginRequest,
     session: Session = Depends(get_session),
+    _demo: None = Depends(require_not_demo),
     _rl: None = Depends(require_rate_limit),
 ) -> LoginResponse:
     """Initiate magic-link login.
@@ -2187,6 +2216,7 @@ async def auth_magic_login(
 async def auth_redeem(
     payload: RedeemRequest,
     session: Session = Depends(get_session),
+    _demo: None = Depends(require_not_demo),
 ) -> RedeemResponse:
     """Consume a magic-link token and return the user's API key."""
     try:
@@ -2225,6 +2255,7 @@ def _billing_guard_pro(user: object, db: Session) -> JSONResponse | None:
 @app.post("/billing/checkout")
 async def billing_checkout(
     session: Session = Depends(get_session),
+    _demo: None = Depends(require_not_demo),
     _role: object = Depends(require_min_role("owner")),
     user: object = Depends(get_current_user),
 ) -> JSONResponse:
@@ -2254,6 +2285,7 @@ async def billing_checkout(
 async def billing_checkout_session(
     request: Request,
     session: Session = Depends(get_session),
+    _demo: None = Depends(require_not_demo),
     _role: object = Depends(require_min_role("owner")),
     user: object = Depends(get_current_user),
 ) -> JSONResponse:
@@ -2286,6 +2318,7 @@ async def billing_checkout_session(
 async def billing_checkout_pro(
     request: Request,
     session: Session = Depends(get_session),
+    _demo: None = Depends(require_not_demo),
     _role: object = Depends(require_min_role("owner")),
     user: object = Depends(get_current_user),
 ) -> JSONResponse:
@@ -2319,6 +2352,7 @@ async def billing_checkout_pro(
 async def billing_portal_session(
     request: Request,
     session: Session = Depends(get_session),
+    _demo: None = Depends(require_not_demo),
     _role: object = Depends(require_min_role("owner")),
     user: object = Depends(get_current_user),
 ) -> JSONResponse:
@@ -5465,6 +5499,7 @@ async def health(session: Session = Depends(get_session)) -> dict:
         "rate_limit_reason": MULTI_WORKER_REASON if MULTI_WORKER else "",
         "workers": workers,
         "stripe_configured": bool(cfg["stripe_secret_key"]),
+        "demo_mode": cfg["demo_mode"],
         "app_url": cfg["app_url"],
     }
 

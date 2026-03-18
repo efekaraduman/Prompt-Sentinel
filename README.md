@@ -363,6 +363,29 @@ curl -s -X POST http://localhost:8000/guard/scan \
 
 Expected: `"decision": "block"`, `"risk_score": 85+`
 
+### Public read-only demo mode
+
+Enable `PROMPTSENTINEL_DEMO_MODE=1` (backend) and `NEXT_PUBLIC_DEMO_MODE=1` (frontend build) to run a safe, public-facing demo instance where visitors can explore all dashboards but cannot create accounts, start campaigns, or trigger billing:
+
+```bash
+# Backend — blocks mutations, keeps guard/scan and all reads active
+export PROMPTSENTINEL_DEMO_MODE=1
+
+# Frontend — shows amber "Demo Mode" banner (baked in at build time)
+echo "NEXT_PUBLIC_DEMO_MODE=1" > app/frontend/.env.local
+cd app/frontend && npm run build && npm start
+```
+
+**What demo mode blocks** (returns `403 demo_mode`):
+- `POST /campaigns` — campaign creation
+- `POST /auth/signup`, `/auth/login`, `/auth/login-password`, `/auth/redeem` — account flows
+- `POST /billing/*` — all billing/Stripe endpoints
+
+**What stays fully active in demo mode**:
+- All `GET` endpoints — dashboard, analytics, findings, guard history
+- `POST /guard/scan` and `/guard/simulate` — live injection detection (offline, rule-based)
+- `POST /admin/demo/seed` — still works to populate demo data
+
 ### Tunnel deployment (Cloudflare or similar)
 
 To share with remote reviewers, tunnel the **frontend** port (3000). The Next.js server proxies `/api/*` to the local backend on your machine — reviewers' browsers never need to reach port 8000 directly.
@@ -372,7 +395,13 @@ To share with remote reviewers, tunnel the **frontend** port (3000). The Next.js
 cloudflared tunnel --url http://localhost:3000
 ```
 
-Set `PROMPTSENTINEL_API_KEY` to a strong random key (`python -c "import secrets; print(secrets.token_hex(32))"`) before starting the server.
+Recommended env vars for a public tunnel:
+
+```bash
+export PROMPTSENTINEL_API_KEY=$(python -c "import secrets; print(secrets.token_hex(32))")
+export PROMPTSENTINEL_RATE_LIMIT_PER_MIN=60
+export PROMPTSENTINEL_DEMO_MODE=1
+```
 
 > **Screenshots / GIF** — coming soon.
 

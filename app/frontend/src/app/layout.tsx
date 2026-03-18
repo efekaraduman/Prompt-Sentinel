@@ -65,6 +65,21 @@ export default function RootLayout({
           <ApiKeyControl />
         </header>
         <UsageBanner />
+        {process.env.NEXT_PUBLIC_DEMO_MODE === "1" && (
+          <div className="bg-amber-500/10 border-b border-amber-500/30 px-4 py-2 text-center text-xs text-amber-400">
+            <span className="font-semibold">Demo Mode</span>
+            {" — "}Read-only preview. Campaign creation, sign-up, and billing are disabled.
+            {" "}
+            <a
+              href="https://github.com/your-org/promptsentinel"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline underline-offset-2 hover:text-amber-300 transition-colors"
+            >
+              Deploy your own instance →
+            </a>
+          </div>
+        )}
         {children}
       </body>
     </html>

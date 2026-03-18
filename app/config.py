@@ -43,6 +43,8 @@ def get_settings() -> dict:
         "stripe_price_id_pro": os.environ.get("STRIPE_PRICE_ID_PRO", ""),
         "stripe_success_url": os.environ.get("STRIPE_SUCCESS_URL", ""),
         "stripe_cancel_url": os.environ.get("STRIPE_CANCEL_URL", ""),
+        # Demo mode
+        "demo_mode": os.environ.get("PROMPTSENTINEL_DEMO_MODE", "") in ("1", "true", "yes"),
         # Redis
         "redis_url": os.environ.get("REDIS_URL", ""),
         # SMTP (B4.2)
